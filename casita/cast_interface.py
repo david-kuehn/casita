@@ -2,9 +2,9 @@ import sys
 import time
 import pychromecast
 
-DEVICE_NAME = ["Kitchen display"]
 current_media_status = ""
 current_media_status_formatted = ""
+current_volume_level = 0.0
 
 def toggle_pause_play():
     if current_media_status.player_is_paused == True:
@@ -20,6 +20,25 @@ def previous_track():
 
 def restart_track():
     chromecast.media_controller.seek(0)
+
+def set_volume(new_volume):
+    # Pychromecast only accepts values from 0-1 for volume, so we have to convert it
+    volume_to_set = new_volume / 100
+
+    chromecast.set_volume(volume_to_set)
+
+class StatusListener:
+    def __init__(self, name, cast):
+        self.name = name
+        self.cast = cast
+
+    def new_cast_status(self, status):
+        global current_volume_level
+        new_volume_level = status.volume_level
+
+        if new_volume_level != current_volume_level:
+            current_volume_level = new_volume_level
+            app_class.update_volume_level(new_volume_level)
 
 class StatusMediaListener:
     def __init__(self, name, cast):
@@ -45,35 +64,46 @@ class StatusMediaListener:
         else:
             app_class.update_pauseplay_btn("Pause")
 
-def start_listening(parent_to_update):
+def start_listening(parent_to_update, device_name):
+
     global app_class
     app_class = parent_to_update
 
     global chromecasts, browser
-    chromecasts, browser = pychromecast.get_listed_chromecasts(friendly_names=DEVICE_NAME)
+    chromecasts, browser = pychromecast.get_chromecasts()
     if not chromecasts:
-        print("No chromecast with name \"" + DEVICE_NAME[0] + "\" found.")
+        print("No chromecasts found.")
         sys.exit(1)
-    global chromecast
-    chromecast = chromecasts[0]
+
+    chromecast_names = []
+    for cast in chromecasts:
+        chromecast_names.append(cast.name)
+
+        if cast.name == device_name:
+            global chromecast
+            chromecast = cast
+            break
+
+    app_class.update_cast_devices(chromecast_names)
 
     # Start socket client's worker thread and wait for initial status update
     chromecast.wait()
+
+    # Regiester a MediaListener object as a listener for general cast status
+    global listenerCast
+    listenerCast = StatusListener(chromecast.name, chromecast)
+    chromecast.register_status_listener(listenerCast)
     
     # Register a StatusMediaListener object as a media status listener
+    global listenerMedia
     listenerMedia = StatusMediaListener(chromecast.name, chromecast)
     chromecast.media_controller.register_status_listener(listenerMedia)
 
-    while True:
-        cmd = input("Listening for Chromecast events...\n\n")
-        if cmd == "skip":
-            skip_track()
-        elif cmd == "restart":
-            restart_track()
-        elif cmd == "previous":
-            previous_track()
-        elif cmd == "end":
-            break
-
     # Shut down discovery
     pychromecast.discovery.stop_discovery(browser)
+
+def stop_listening():
+    global chromecast, listenerCast, listenerMedia
+    del listenerCast, listenerMedia
+    chromecast.disconnect(blocking=True)
+    print("Disconnected")
