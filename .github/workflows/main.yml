@@ -23,10 +23,18 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
-      - name: Install setuptools
+      - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then sudo pip install -r requirements.txt; fi
           
       - name: Build py2app
         run: python setup.py py2app
+      
+      - name: Upload a Build Artifact
+        uses: actions/upload-artifact@v2.2.1
+        with:
+          # Artifact name
+          name: Casita
+          # A file, directory or wildcard pattern that describes what to upload
+          path: dist/Casita.app
