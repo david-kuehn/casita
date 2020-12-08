@@ -1,2 +1,4 @@
 pychromecast
 rumps
+setuptools
+py2app
