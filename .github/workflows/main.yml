@@ -26,8 +26,7 @@ jobs:
       - name: Install setuptools
         run: |
           python -m pip install --upgrade pip
-          pip install setuptools
-          pip install py2app
-
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          
       - name: Build py2app
         run: python casita/setup.py py2app
