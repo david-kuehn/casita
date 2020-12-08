@@ -1,10 +1,10 @@
 from setuptools import setup
 
-APP = ['casita.py']
+APP = ['casita/casita.py']
 DATA_FILES = []
 OPTIONS = {
     'argv_emulation': True,
-    'iconfile': '../house-icon.icns',
+    'iconfile': 'house-icon.icns',
     'plist': {
         'LSUIElement': True,
     },
