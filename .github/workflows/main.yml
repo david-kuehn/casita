@@ -29,4 +29,4 @@ jobs:
           if [ -f requirements.txt ]; then sudo pip install -r requirements.txt; fi
           
       - name: Build py2app
-        run: python casita/setup.py py2app
+        run: python setup.py py2app
