@@ -2,8 +2,8 @@ import sys
 import time
 import pychromecast
 
-current_media_status = ""
-current_media_status_formatted = ""
+current_media_status = None
+current_track_title = ""
 current_volume_level = 0.0
 
 def toggle_pause_play():
@@ -24,7 +24,6 @@ def restart_track():
 def set_volume(new_volume):
     # Pychromecast only accepts values from 0-1 for volume, so we have to convert it
     volume_to_set = new_volume / 100
-
     chromecast.set_volume(volume_to_set)
 
 class StatusListener:
@@ -35,6 +34,8 @@ class StatusListener:
     def new_cast_status(self, status):
         global current_volume_level
         new_volume_level = status.volume_level
+
+        print("New Cast Status: " + str(status.volume_level))
 
         if new_volume_level != current_volume_level:
             current_volume_level = new_volume_level
@@ -48,24 +49,30 @@ class StatusMediaListener:
     # status is of type MediaStatus - https://bit.ly/mediastatus
     def new_media_status(self, status):
         global current_media_status
-        global current_media_status_formatted
-        current_media_status = status
+        global current_track_title
 
-        new_status_formatted = status.title + " · " + status.artist
+        def send_media_update():
+            global current_track_title
 
-        # Only print new status if it's actually a new status
-        if new_status_formatted != current_media_status_formatted:
             print(status.title + " · " + status.artist)
-            current_media_status_formatted = new_status_formatted
-            app_class.update_song_title(current_media_status_formatted)
+            app_class.update_track_details(status)
+            current_track_title = status.title
+
+        if type(status.title) == str:
+            if current_media_status == None:
+                send_media_update()
+            else:
+                if current_track_title != status.title:
+                    send_media_update()
 
         if status.player_is_paused == True:
             app_class.update_pauseplay_btn("Play")
         else:
             app_class.update_pauseplay_btn("Pause")
 
-def start_listening(parent_to_update, device_name):
+        current_media_status = status
 
+def start_listening(parent_to_update, device_name):
     global app_class
     app_class = parent_to_update
 
@@ -82,14 +89,15 @@ def start_listening(parent_to_update, device_name):
         if cast.name == device_name:
             global chromecast
             chromecast = cast
-            break
-
-    app_class.update_cast_devices(chromecast_names)
 
     # Start socket client's worker thread and wait for initial status update
     chromecast.wait()
 
-    # Regiester a MediaListener object as a listener for general cast status
+    print("Connected to " + chromecast.name)
+
+    app_class.update_cast_devices(chromecast_names, chromecast.name)
+
+    # Register a MediaListener object as a listener for general cast status
     global listenerCast
     listenerCast = StatusListener(chromecast.name, chromecast)
     chromecast.register_status_listener(listenerCast)
@@ -106,4 +114,11 @@ def stop_listening():
     global chromecast, listenerCast, listenerMedia
     del listenerCast, listenerMedia
     chromecast.disconnect(blocking=True)
+    reset_app_class_details()
     print("Disconnected")
+
+def reset_app_class_details():
+    global current_media_status
+    current_media_status = None
+    app_class.update_track_details(None)
+    app_class.update_volume_level(0)
