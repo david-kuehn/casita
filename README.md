@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./house-icon.png" width=20% style="margin-right: 32px">
+  <img src="https://raw.githubusercontent.com/david-kuehn/casita/master/house-icon.png" width=20% style="margin-right: 32px">
 </p>
 
 <h1 align="center">Casita</h1>
