@@ -13,7 +13,7 @@
 </p>
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/david-kuehn/casita/master/readme_img.png" width="70%">
+  <img src="https://raw.githubusercontent.com/david-kuehn/casita/master/readme_img.png" width="50%">
 </p>
 
 ### Details
