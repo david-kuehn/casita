@@ -43,7 +43,7 @@ class CasitaApp:
 
     # Start new CastInterfaceThread
     def start_thread(self):
-        CastInterfaceThread(parent=self, device_name="Kitchen display")
+        CastInterfaceThread(parent=self, device_name="Kitchen Display")
 
     # Update track title + album/artist menu items
     def update_track_details(self, new_details):

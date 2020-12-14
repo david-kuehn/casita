@@ -30,8 +30,17 @@
 * [pychromecast](https://github.com/home-assistant-libs/pychromecast)
 * [rumps](https://github.com/jaredks/rumps)
 
-## Running Casita
-### Building the macOS App
+## Installing Casita
+### Download the App
+First, download and unzip the [latest release](https://github.com/david-kuehn/casita/releases).
+
+Casita is not officially signed by Apple, meaning that there are a few extra steps in order to be able to run it:
+1. Control-click on the app, and choose "Open."
+1. In the alert that appears, if you see an option to open, select it, and Casita should open! Otherwise, choose "Cancel" and proceed to the next step.
+1. Control-click on the app again, choose "Open," and a new alert should appear that gives you an option to open the app.
+
+After getting the app to open once, you shouldn't have any more problems in the future. Please refer to [Apple's documentation](https://support.apple.com/en-au/guide/mac-help/mh40616/mac) for further reference.
+### Manually Building the macOS App
 1. Install all the dependencies from [requirements.txt](./requirements.txt).
    - `pip install -r requirements.txt`
 1. In the project's root directory, build the app using [py2app](https://github.com/ronaldoussoren/py2app).
