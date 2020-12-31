@@ -4,15 +4,24 @@ import threading
 import time
 import cast_interface
 import sys
+import json
+from os import path
 
 # Class that handles menubar app itself
 class CasitaApp:
     def __init__(self):
+        global USER_SETTINGS
+
         self.app = rumps.App("Casita", "🏡")
 
         # Reusable, generic items
         self.quit_btn = rumps.MenuItem(title="Quit", callback=rumps.quit_application)
         self.separator = None
+
+        # Items to display when no device is connected
+        self.no_device_item = rumps.MenuItem(title="No Device Connected")
+        self.cast_devices_parent = rumps.MenuItem(title="Cast Devices")
+        self.not_connected_menu_items = [self.no_device_item, self.separator, self.cast_devices_parent]
 
         # Items to display in menu while connecting to Cast device
         self.connecting_item = rumps.MenuItem(title="Connecting...")
@@ -25,25 +34,28 @@ class CasitaApp:
         self.skip_btn = rumps.MenuItem(title="Skip", callback=self.skip)
         self.rewind_btn = rumps.MenuItem(title="Rewind", callback=self.rewind)
         self.volume_slider = rumps.SliderMenuItem(value=0, min_value=0, max_value=100, dimensions=(150, 30), callback=self.change_volume)
-        self.cast_devices_parent = rumps.MenuItem(title="Cast Devices")
         self.playing_menu_items = [self.track_title_item, self.track_album_artist_item, self.separator, self.volume_slider, self.pauseplay_btn, self.skip_btn, self.rewind_btn, self.separator, self.cast_devices_parent]
         
         # Items to display in menu while connected, but no media is playing
         self.no_song_item = rumps.MenuItem(title="No Song Playing")
         self.idle_menu_items = [self.no_song_item, self.separator, self.volume_slider, self.separator, self.cast_devices_parent]
 
-        # On initialize, we want to show the connecting menu items
-        self.app.menu = self.connecting_menu_items
+        # If there is a default device assigned in the user settings, show the 'connecting' menu. Otherwise, show the 'not connected' menu
+        if USER_SETTINGS["default_device"] != "":
+            # Show the connecting menu items
+            self.app.menu = self.connecting_menu_items
+        else:
+            self.app.menu = self.not_connected_menu_items
 
         # After initializing the menu UI, start the backend's thread
-        self.start_thread()
+        self.start_thread(USER_SETTINGS["default_device"])
 
     def run(self):
         self.app.run()
 
     # Start new CastInterfaceThread
-    def start_thread(self):
-        CastInterfaceThread(parent=self, device_name="Kitchen Display")
+    def start_thread(self, device):
+        CastInterfaceThread(parent=self, device_name=device)
 
     # Update track title + album/artist menu items
     def update_track_details(self, new_details):
@@ -126,7 +138,9 @@ class CasitaApp:
 
     # Switch the device we're monitoring
     def change_selected_cast_device(self, new_device):
-        cast_interface.stop_listening()
+        # If currently connected, disconnect
+        if cast_interface.is_connected == True:
+            cast_interface.stop_listening()
         cast_interface.start_listening(self, new_device.title, False)
 
     # Toggle pause/play
@@ -155,10 +169,24 @@ class CastInterfaceThread(threading.Thread):
         self.start()
 
     def run(self):
-        cast_interface.start_listening(self.parent, self.device_name, is_reconnection=False)
+        # If there is a device passed, tell cast_interface to start listening to that device
+        # If not, tell cast_interface to just discover
+        if self.device_name != "":
+            cast_interface.start_listening(app_class_reference=self.parent, device_name=self.device_name, is_reconnection=False)
+        else:
+            # Just Discover
+            print("No default device. Attempting to start discovery.")
+            cast_interface.discover_devices(app_class_reference=self.parent)
+        
 
 # Execution loop
 if __name__ == "__main__":
+    # Get user settings
+    global USER_SETTINGS
+    settings_file = open("user_settings.json")
+    USER_SETTINGS = json.loads(settings_file.read())
+    print(USER_SETTINGS)
+
     # If there are arguments passed
     if len(sys.argv) > 1:
         if sys.argv[1] == "--debug":

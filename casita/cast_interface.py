@@ -6,6 +6,7 @@ current_media_status = None
 current_track_title = ""
 current_volume_level = 0.0
 previous_connection_status = ""
+is_connected = False
 
 def toggle_pause_play():
     if current_media_status.player_is_paused == True:
@@ -83,13 +84,13 @@ class ConnectionListener:
         # Identify whether or not the 'DISCONNECTED' message is preceded by a 'FAILED_RESOLVE'
         # If it is, then attempt to reconnect. If it isn't, it's probably an intended disconnection
         if previous_connection_status == "FAILED_RESOLVE" and connection_status.status == "DISCONNECTED":
-            start_listening(parent_to_update=app_class, device_name=name_for_reconnection, is_reconnection=True)
+            start_listening(app_class_reference=app_class, device_name=name_for_reconnection, is_reconnection=True)
         
         previous_connection_status = connection_status.status
 
-def start_listening(parent_to_update, device_name, is_reconnection):
+def start_listening(app_class_reference, device_name, is_reconnection):
     global app_class
-    app_class = parent_to_update
+    app_class = app_class_reference
 
     # Tell the app class that we're starting the connection process
     app_class.set_connecting_status(device_name=device_name, is_connecting=True, is_reconnection=is_reconnection)
@@ -136,6 +137,9 @@ def start_listening(parent_to_update, device_name, is_reconnection):
 
     # Tell the app class that we're done connecting
     app_class.set_connecting_status(device_name=device_name, is_connecting=False, is_reconnection=is_reconnection)
+    
+    global is_connected
+    is_connected = True
 
 def stop_listening():
     global chromecast, listenerCast, listenerMedia
@@ -143,6 +147,25 @@ def stop_listening():
     chromecast.disconnect(blocking=True)
     reset_app_class_details()
     print("Disconnected")
+
+    global is_connected
+    is_connected = False
+
+def discover_devices(app_class_reference):
+    global chromecasts, browser
+    chromecasts, browser = pychromecast.get_chromecasts()
+    if not chromecasts:
+        print("No chromecasts found.")
+
+    chromecast_names = []
+    for cast in chromecasts:
+        chromecast_names.append(cast.name)
+
+    global app_class
+    app_class = app_class_reference
+    app_class.update_cast_devices(chromecast_names, "")
+
+    print("Discovered cast devices.")
 
 def reset_app_class_details():
     global current_media_status

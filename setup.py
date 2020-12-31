@@ -1,7 +1,7 @@
 from setuptools import setup
 
 APP = ['casita/casita.py']
-DATA_FILES = []
+DATA_FILES = ['casita/user_settings.json']
 OPTIONS = {
     'argv_emulation': True,
     'iconfile': 'house-icon.icns',
