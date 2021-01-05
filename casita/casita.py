@@ -21,11 +21,11 @@ class CasitaApp:
         # Items to display when no device is connected
         self.no_device_item = rumps.MenuItem(title="No Device Connected")
         self.cast_devices_parent = rumps.MenuItem(title="Cast Devices")
-        self.not_connected_menu_items = [self.no_device_item, self.separator, self.cast_devices_parent]
+        self.not_connected_menu_items = [self.no_device_item, self.separator]
 
         # Items to display in menu while connecting to Cast device
         self.connecting_item = rumps.MenuItem(title="Connecting...")
-        self.connecting_menu_items = [self.connecting_item]
+        self.connecting_menu_items = [self.connecting_item, self.quit_btn]
 
         # Items to display in menu while media is playing on a Cast device
         self.track_title_item = rumps.MenuItem(title="No Song Playing")
@@ -57,14 +57,25 @@ class CasitaApp:
     def start_thread(self, device):
         CastInterfaceThread(parent=self, device_name=device)
 
+    # Utility method - repopulates menu with items from new_menu_items
+    def update_menu(self, new_menu_items):
+        # Clear the old items out of the menu
+        self.app.menu.clear()
+
+        # If the second-to-last menu item is not a separator, add a separator
+        if new_menu_items[-2] != None:
+            new_menu_items.append(self.separator)
+        # If the last menu is not a quit button, add one
+        if new_menu_items[-1].title != "Quit":
+            new_menu_items.append(self.quit_btn)
+
+        self.app.menu = new_menu_items
+
     # Update track title + album/artist menu items
     def update_track_details(self, new_details):
         # new_details is of type MediaStatus
         if new_details == None:
-            self.app.menu.clear()
-            self.app.menu = self.idle_menu_items
-            self.app.menu.add(self.separator)
-            self.app.menu.add(self.quit_btn)
+            self.update_menu(self.idle_menu_items)
         else:
             # If the menu is currently showing the controls for when media is playing (there are 7 items in the idle controls)
             if len(self.app.menu) > 9:
@@ -73,10 +84,7 @@ class CasitaApp:
                 self.track_album_artist_item.title = new_details.artist + " — " + new_details.album_name
             else:
                 # Clear the menu and add the playing menu items
-                self.app.menu.clear()
-                self.app.menu = self.playing_menu_items
-                self.app.menu.add(self.separator)
-                self.app.menu.add(self.quit_btn)
+                self.update_menu(self.playing_menu_items)
 
                 # Then, reset the song, artist, and album
                 self.track_title_item.title = new_details.title
@@ -92,6 +100,16 @@ class CasitaApp:
 
     # Update list of cast devices
     def update_cast_devices(self, new_cast_devices, new_selected_device):
+        # Determine if the Cast Devices button is already in the menu
+        cast_devices_is_in_menu = False
+        for item in self.app.menu:
+            if item == "Cast Devices":
+                cast_devices_is_in_menu = True
+        
+        # If the Cast Devices button isn't already in the menu, add it
+        if cast_devices_is_in_menu == False:
+            self.app.menu.insert_after("SeparatorMenuItem_1", self.cast_devices_parent)
+
         # Alphabetize list of devices
         new_cast_devices.sort()
 
@@ -112,11 +130,9 @@ class CasitaApp:
                 self.cast_devices_parent.add(device_to_add)
             
     # Update the menu items to reflect the current connection status
-    def set_connecting_status(self, device_name, is_connecting, is_reconnection):
+    def set_connecting_status(self, device_name, is_connecting, is_reconnection, did_succeed):
         # If we're connecting
         if is_connecting == True:
-            self.app.menu.clear()
-
             # If we're reconnecting
             if is_reconnection == True:
                 self.connecting_item.title = "Reconnecting to " + device_name + "..."
@@ -124,13 +140,14 @@ class CasitaApp:
                 self.connecting_item.title = "Connecting to " + device_name + "..."
             
             # Repopulate the menu with the connecting items
-            self.app.menu = self.connecting_menu_items
+            self.update_menu(self.connecting_menu_items)
         else:
-            # Populate the menu with the idle items
-            self.app.menu.clear()
-            self.app.menu = self.idle_menu_items
-            self.app.menu.add(self.separator)
-            self.app.menu.add(self.quit_btn)
+            if did_succeed == True:
+                # Populate the menu with the idle items
+                self.update_menu(self.idle_menu_items)
+            else:
+                # Populate the menu with the disconnected items
+                self.update_menu(self.not_connected_menu_items)
 
     #
     # Begin functions that interact with backend

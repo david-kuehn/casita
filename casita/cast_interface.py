@@ -93,13 +93,13 @@ def start_listening(app_class_reference, device_name, is_reconnection):
     app_class = app_class_reference
 
     # Tell the app class that we're starting the connection process
-    app_class.set_connecting_status(device_name=device_name, is_connecting=True, is_reconnection=is_reconnection)
-
+    # Currently breaks the app, so it's been commented out for now
+    #app_class.set_connecting_status(device_name=device_name, is_connecting=True, is_reconnection=is_reconnection, did_succeed=False)
+    
     global chromecasts, browser
     chromecasts, browser = pychromecast.get_chromecasts()
     if not chromecasts:
-        print("No chromecasts found.")
-        sys.exit(1)
+        print("No chromecasts found when connecting.")
 
     chromecast_names = []
     for cast in chromecasts:
@@ -136,7 +136,7 @@ def start_listening(app_class_reference, device_name, is_reconnection):
     chromecast.socket_client.tries = 1
 
     # Tell the app class that we're done connecting
-    app_class.set_connecting_status(device_name=device_name, is_connecting=False, is_reconnection=is_reconnection)
+    app_class.set_connecting_status(device_name=device_name, is_connecting=False, is_reconnection=is_reconnection, did_succeed=True)
     
     global is_connected
     is_connected = True
@@ -155,7 +155,7 @@ def discover_devices(app_class_reference):
     global chromecasts, browser
     chromecasts, browser = pychromecast.get_chromecasts()
     if not chromecasts:
-        print("No chromecasts found.")
+        print("No chromecasts found when discovering.")
 
     chromecast_names = []
     for cast in chromecasts:
