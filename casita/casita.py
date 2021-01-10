@@ -3,6 +3,7 @@ import rumps
 import threading
 import time
 import cast_interface
+import prefs
 import sys
 import json
 from os import path
@@ -10,9 +11,22 @@ from os import path
 # Class that handles menubar app itself
 class CasitaApp:
     def __init__(self):
-        global USER_SETTINGS
+        global USER_PREFS
 
         self.app = rumps.App("Casita", "🏡")
+
+        prefs.init_app_class(self)
+
+        # Preference items
+        self.prefs_parent = rumps.MenuItem(title="Preferences")
+
+        self.prefs_icon_parent = rumps.MenuItem(title="Icon")
+        self.prefs_icon_items = [rumps.MenuItem(title="Colored Icon", callback=prefs.set_icon_colored), rumps.MenuItem(title="Monochrome Icon", callback=prefs.set_icon_mono)]
+
+        # Initialize icon prefs
+        self.prefs_parent.add(self.prefs_icon_parent)
+        for item in self.prefs_icon_items:
+            self.prefs_icon_parent.add(item)
 
         # Reusable, generic items
         self.quit_btn = rumps.MenuItem(title="Quit", callback=rumps.quit_application)
@@ -41,14 +55,15 @@ class CasitaApp:
         self.idle_menu_items = [self.no_song_item, self.separator, self.volume_slider, self.separator, self.cast_devices_parent]
 
         # If there is a default device assigned in the user settings, show the 'connecting' menu. Otherwise, show the 'not connected' menu
-        if USER_SETTINGS["default_device"] != "":
-            # Show the connecting menu items
-            self.app.menu = self.connecting_menu_items
+        if USER_PREFS["default_device"] != "":
+            self.update_menu(self.connecting_menu_items, add_quit=False)
+            #self.app.menu = self.connecting_menu_items
         else:
-            self.app.menu = self.not_connected_menu_items
+            self.update_menu(self.not_connected_menu_items, add_quit=False)
+            #self.app.menu = self.not_connected_menu_items
 
         # After initializing the menu UI, start the backend's thread
-        self.start_thread(USER_SETTINGS["default_device"])
+        self.start_thread(USER_PREFS["default_device"])
 
     def run(self):
         self.app.run()
@@ -58,13 +73,28 @@ class CasitaApp:
         CastInterfaceThread(parent=self, device_name=device)
 
     # Utility method - repopulates menu with items from new_menu_items
-    def update_menu(self, new_menu_items):
+    def update_menu(self, new_menu_items, add_quit = True):
         # Clear the old items out of the menu
         self.app.menu.clear()
 
-        # If the last menu item is not a quit button, add one and a separator before it
-        if new_menu_items[-1].title != "Quit":
+        found_quit = False
+        found_prefs = False
+
+        # Check for quit and preferences buttons in menu
+        for item in new_menu_items:
+            if item != None and isinstance(item, rumps.SliderMenuItem) == False:
+                if item.title == "Quit":
+                    found_quit = True
+                elif item.title == "Preferences":
+                    found_prefs = True
+
+        # If the preferences don't already exist, add them
+        if found_prefs == False:
             new_menu_items.append(self.separator)
+            new_menu_items.append(self.prefs_parent)
+
+        # If the quit button doesn't already exist, add it
+        if found_quit == False and add_quit == True:
             new_menu_items.append(self.quit_btn)
 
         self.app.menu = new_menu_items
@@ -198,10 +228,10 @@ class CastInterfaceThread(threading.Thread):
 # Execution loop
 if __name__ == "__main__":
     # Get user settings
-    global USER_SETTINGS
-    settings_file = open("user_settings.json")
-    USER_SETTINGS = json.loads(settings_file.read())
-    print(USER_SETTINGS)
+    global USER_PREFS
+    settings_file = open("user_preferences.json")
+    USER_PREFS = json.loads(settings_file.read())
+    print(USER_PREFS)
 
     # If there are arguments passed
     if len(sys.argv) > 1:
