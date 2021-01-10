@@ -93,8 +93,7 @@ def start_listening(app_class_reference, device_name, is_reconnection):
     app_class = app_class_reference
 
     # Tell the app class that we're starting the connection process
-    # Currently breaks the app, so it's been commented out for now
-    #app_class.set_connecting_status(device_name=device_name, is_connecting=True, is_reconnection=is_reconnection, did_succeed=False)
+    app_class.set_connecting_status(device_name=device_name, is_connecting=True, is_reconnection=is_reconnection, did_succeed=False)
     
     global chromecasts, browser
     chromecasts, browser = pychromecast.get_chromecasts()
@@ -140,6 +139,9 @@ def start_listening(app_class_reference, device_name, is_reconnection):
     
     global is_connected
     is_connected = True
+
+    # Use to trigger initial status update
+    chromecast.set_volume_muted(False)
 
 def stop_listening():
     global chromecast, listenerCast, listenerMedia

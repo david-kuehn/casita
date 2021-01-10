@@ -62,7 +62,7 @@ class CasitaApp:
         # Clear the old items out of the menu
         self.app.menu.clear()
 
-        # If the last menu is not a quit button, add one
+        # If the last menu item is not a quit button, add one and a separator before it
         if new_menu_items[-1].title != "Quit":
             new_menu_items.append(self.separator)
             new_menu_items.append(self.quit_btn)
