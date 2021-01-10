@@ -62,11 +62,9 @@ class CasitaApp:
         # Clear the old items out of the menu
         self.app.menu.clear()
 
-        # If the second-to-last menu item is not a separator, add a separator
-        if new_menu_items[-2] != None:
-            new_menu_items.append(self.separator)
         # If the last menu is not a quit button, add one
         if new_menu_items[-1].title != "Quit":
+            new_menu_items.append(self.separator)
             new_menu_items.append(self.quit_btn)
 
         self.app.menu = new_menu_items
@@ -109,6 +107,7 @@ class CasitaApp:
         # If the Cast Devices button isn't already in the menu, add it
         if cast_devices_is_in_menu == False:
             self.app.menu.insert_after("SeparatorMenuItem_1", self.cast_devices_parent)
+            self.app.menu.insert_after("Cast Devices", self.separator)
 
         # Alphabetize list of devices
         new_cast_devices.sort()
