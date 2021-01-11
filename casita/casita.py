@@ -6,7 +6,6 @@ import cast_interface
 import prefs
 import sys
 import json
-from os import path
 
 # Class that handles menubar app itself
 class CasitaApp:
@@ -17,20 +16,27 @@ class CasitaApp:
 
         prefs.init_app_class(self)
 
+        # Reusable, generic items
+        self.quit_btn = rumps.MenuItem(title="Quit", callback=rumps.quit_application)
+        self.separator = None
+
         # Preference items
         self.prefs_parent = rumps.MenuItem(title="Preferences")
 
         self.prefs_icon_parent = rumps.MenuItem(title="Icon")
         self.prefs_icon_items = [rumps.MenuItem(title="Colored Icon", callback=prefs.set_icon_colored), rumps.MenuItem(title="Monochrome Icon", callback=prefs.set_icon_mono)]
 
-        # Initialize icon prefs
+        self.prefs_about_parent = rumps.MenuItem(title="About")
+        self.prefs_about_items = [rumps.MenuItem(title="Casita 🏡 | v0.1.4"), None, rumps.MenuItem(title="Made w/ <3 by David Kuehn")]
+        
+        # Initialize prefs
         self.prefs_parent.add(self.prefs_icon_parent)
+        self.prefs_parent.add(self.separator)
+        self.prefs_parent.add(self.prefs_about_parent)
         for item in self.prefs_icon_items:
             self.prefs_icon_parent.add(item)
-
-        # Reusable, generic items
-        self.quit_btn = rumps.MenuItem(title="Quit", callback=rumps.quit_application)
-        self.separator = None
+        for item in self.prefs_about_items:
+            self.prefs_about_parent.add(item)
 
         # Items to display when no device is connected
         self.no_device_item = rumps.MenuItem(title="No Device Connected")
@@ -53,6 +59,9 @@ class CasitaApp:
         # Items to display in menu while connected, but no media is playing
         self.no_song_item = rumps.MenuItem(title="No Song Playing")
         self.idle_menu_items = [self.no_song_item, self.separator, self.volume_slider, self.separator, self.cast_devices_parent]
+
+        # Initialize preferences
+        USER_PREFS = prefs.read_prefs()
 
         # If there is a default device assigned in the user settings, show the 'connecting' menu. Otherwise, show the 'not connected' menu
         if USER_PREFS["default_device"] != "":
@@ -227,13 +236,7 @@ class CastInterfaceThread(threading.Thread):
 
 # Execution loop
 if __name__ == "__main__":
-    # Get user settings
-    global USER_PREFS
-    settings_file = open("user_preferences.json")
-    USER_PREFS = json.loads(settings_file.read())
-    print(USER_PREFS)
-
-    # If there are arguments passed
+# If there are arguments passed
     if len(sys.argv) > 1:
         if sys.argv[1] == "--debug":
             print("Debug mode enabled")
