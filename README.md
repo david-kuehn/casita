@@ -52,3 +52,7 @@ After getting the app to open once, you shouldn't have any more problems in the 
 1. Run the command `python3 casita/casita.py`.
    - This can be run with the `--debug` flag to enable [rumps debug mode](https://github.com/jaredks/rumps/blob/5a868f4fae5e51ccbc95d426e55d689515834b6e/rumps/rumps.py#L33-L42), which gives some extra output corresponding to UI interaction.
 1. To quit, use the 'Quit' button in the app's UI, or close the terminal instance.
+
+
+## Upcoming Features
+A list of planned features can be found [here](https://www.notion.so/44ee7785b90a465a8a2cb976515c861d?v=b235220cb068453aa1cf0144ccf72eaa). Feel free to leave comments on the Notion page to suggest new features and comment on features that are already in the pipeline.
