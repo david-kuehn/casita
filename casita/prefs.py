@@ -1,4 +1,5 @@
 import json
+import cast_interface
 
 app_class = None
 
@@ -37,3 +38,12 @@ def set_icon_mono(sender):
     wrt_prefs = open("user_preferences.json", "w")
     wrt_prefs.write(json.dumps(USER_PREFS))
     wrt_prefs.close()
+
+def save_favorite_volume(sender):
+    USER_PREFS["volume"] = cast_interface.current_volume_level
+    wrt_prefs = open("user_preferences.json", "w")
+    wrt_prefs.write(json.dumps(USER_PREFS))
+    wrt_prefs.close()
+
+def set_to_favorite_volume(sender):
+    cast_interface.set_volume(USER_PREFS["volume"] * 100)

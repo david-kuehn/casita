@@ -26,15 +26,21 @@ class CasitaApp:
         self.prefs_icon_parent = rumps.MenuItem(title="Icon")
         self.prefs_icon_items = [rumps.MenuItem(title="Colored Icon", callback=prefs.set_icon_colored), rumps.MenuItem(title="Monochrome Icon", callback=prefs.set_icon_mono)]
 
+        self.prefs_volume_parent = rumps.MenuItem(title="Volume")
+        self.prefs_volume_items = [rumps.MenuItem(title="Set to Favorite Volume", callback=prefs.set_to_favorite_volume), None, rumps.MenuItem(title="Save Current Volume as Favorite", callback=prefs.save_favorite_volume)]
+
         self.prefs_about_parent = rumps.MenuItem(title="About")
         self.prefs_about_items = [rumps.MenuItem(title="Casita 🏡 | v0.1.4"), None, rumps.MenuItem(title="Made w/ <3 by David Kuehn")]
         
         # Initialize prefs
         self.prefs_parent.add(self.prefs_icon_parent)
+        self.prefs_parent.add(self.prefs_volume_parent)
         self.prefs_parent.add(self.separator)
         self.prefs_parent.add(self.prefs_about_parent)
         for item in self.prefs_icon_items:
             self.prefs_icon_parent.add(item)
+        for item in self.prefs_volume_items:
+            self.prefs_volume_parent.add(item)
         for item in self.prefs_about_items:
             self.prefs_about_parent.add(item)
 
@@ -85,6 +91,16 @@ class CasitaApp:
     def update_menu(self, new_menu_items, add_quit = True):
         # Clear the old items out of the menu
         self.app.menu.clear()
+
+        # If there is a device connected, enable the volume preferences. Otherwise, disable them
+        if cast_interface.is_connected == True:
+            if len(self.prefs_volume_parent) == 1:
+                self.prefs_volume_parent.clear()
+                for item in self.prefs_volume_items:
+                    self.prefs_volume_parent.add(item)
+        else:
+            self.prefs_volume_parent.clear()
+            self.prefs_volume_parent.add(rumps.MenuItem(title="Connect device to configure volume settings."))
 
         found_quit = False
         found_prefs = False
