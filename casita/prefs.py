@@ -22,6 +22,8 @@ def read_prefs():
     return USER_PREFS
 
 def set_icon_colored(sender):
+    app_class.template = None
+
     app_class.app.title = "🏡"
     app_class.app.icon = None
 
@@ -31,6 +33,8 @@ def set_icon_colored(sender):
     wrt_prefs.close()
 
 def set_icon_mono(sender):
+    app_class.app.template = True
+
     app_class.app.icon = "img/mono-house-blk.png"
     app_class.app.title = None
 
