@@ -1,6 +1,7 @@
 # Custom Casita Ignores
 .vscode
 *.code-workspace
+casita/user_preferences.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

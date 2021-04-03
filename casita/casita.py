@@ -30,7 +30,7 @@ class CasitaApp:
         self.prefs_volume_items = [rumps.MenuItem(title="Set to Favorite Volume", callback=prefs.set_to_favorite_volume), None, rumps.MenuItem(title="Save Current Volume as Favorite", callback=prefs.save_favorite_volume)]
 
         self.prefs_about_parent = rumps.MenuItem(title="About")
-        self.prefs_about_items = [rumps.MenuItem(title="Casita 🏡 | v0.1.4"), None, rumps.MenuItem(title="Made w/ <3 by David Kuehn")]
+        self.prefs_about_items = [rumps.MenuItem(title="Casita 🏡 | v0.1.5"), None, rumps.MenuItem(title="Made w/ <3 by David Kuehn")]
         
         # Initialize prefs
         self.prefs_parent.add(self.prefs_icon_parent)
@@ -171,17 +171,25 @@ class CasitaApp:
         if len(self.cast_devices_parent) != 0:
             self.cast_devices_parent.clear()
 
-        for device in new_cast_devices:
-            device_to_add = rumps.MenuItem(title=device, callback=self.change_selected_cast_device)
+        # If the list of new devices isn't empty
+        if len(new_cast_devices) != 0:
+            for device in new_cast_devices:
+                device_to_add = rumps.MenuItem(title=device, callback=self.change_selected_cast_device)
 
-            # If the currently-iterating device is the newly-selected device
-            if device == new_selected_device:
-                # Mark it as enabled and insert it into the first position in the menu
-                device_to_add.state = 1
-                self.cast_devices_parent.insert_before(self.cast_devices_parent[new_cast_devices[0]].title, device_to_add)
-                self.cast_devices_parent.insert_after(self.cast_devices_parent[device].title, None)
-            else:
-                self.cast_devices_parent.add(device_to_add)
+                # If the currently-iterating device is the newly-selected device
+                if device == new_selected_device:
+                    # Mark it as enabled and insert it into the first position in the menu
+                    device_to_add.state = 1
+                    self.cast_devices_parent.insert_before(self.cast_devices_parent[new_cast_devices[0]].title, device_to_add)
+                    self.cast_devices_parent.insert_after(self.cast_devices_parent[device].title, None)
+                else:
+                    self.cast_devices_parent.add(device_to_add)
+            self.cast_devices_parent.add(None)
+            self.cast_devices_parent.add(rumps.MenuItem(title="Disconnect"))
+        else:
+            self.cast_devices_parent.add(rumps.MenuItem(title="No Devices Found"))
+            self.cast_devices_parent.add(None)
+        self.cast_devices_parent.add(rumps.MenuItem(title="Scan Again", callback=self.scan_again))
             
     # Update the menu items to reflect the current connection status
     def set_connecting_status(self, device_name, is_connecting, is_reconnection, did_succeed):
@@ -206,6 +214,11 @@ class CasitaApp:
     #
     # Begin functions that interact with backend
     #
+
+    # Restart discovery process
+    def scan_again(self, sender):
+        cast_interface.discover_devices(app_class_reference=self)
+        print("Restarting scan...")
 
     # Switch the device we're monitoring
     def change_selected_cast_device(self, new_device):

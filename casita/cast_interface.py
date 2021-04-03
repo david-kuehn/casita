@@ -156,12 +156,12 @@ def stop_listening():
 def discover_devices(app_class_reference):
     global chromecasts, browser
     chromecasts, browser = pychromecast.get_chromecasts()
+    chromecast_names = []
     if not chromecasts:
         print("No chromecasts found when discovering.")
-
-    chromecast_names = []
-    for cast in chromecasts:
-        chromecast_names.append(cast.name)
+    else:
+        for cast in chromecasts:
+            chromecast_names.append(cast.name)
 
     global app_class
     app_class = app_class_reference
