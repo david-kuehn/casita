@@ -124,7 +124,7 @@ class CasitaApp:
     def update_track_details(self, new_details):
         # new_details is of type MediaStatus
         if new_details == None:
-            self.update_menu(self.idle_menu_items)
+            self.update_menu(self.not_connected_menu_items)
         else:
             # If the menu is currently showing the controls for when media is playing (there are 7 items in the idle controls)
             if len(self.app.menu) > 9:
@@ -153,9 +153,10 @@ class CasitaApp:
         # Determine if the Cast Devices button is already in the menu
         cast_devices_is_in_menu = False
         for item in self.app.menu:
-            if item == "Cast Devices":
+            if item == "Cast Devices" and cast_interface.is_connected == True:
                 cast_devices_is_in_menu = True
                 print("2")
+                break
         
         # If the Cast Devices button isn't already in the menu, add it
         if cast_devices_is_in_menu == False:
@@ -183,7 +184,6 @@ class CasitaApp:
                 else:
                     self.cast_devices_parent.add(device_to_add)
             self.cast_devices_parent.add(None)
-            self.cast_devices_parent.add(rumps.MenuItem(title="Disconnect", callback=self.disconnect))
         else:
             self.cast_devices_parent.add(rumps.MenuItem(title="No Devices Found"))
             self.cast_devices_parent.add(None)
@@ -216,10 +216,6 @@ class CasitaApp:
     # Restart discovery process
     def scan_again(self, sender):
         print("Restarting scan...")
-        cast_interface.discover_devices(app_class_reference=self)
-
-    def disconnect(self, sender):
-        disconnected = cast_interface.stop_listening()
         cast_interface.discover_devices(app_class_reference=self)
 
     # Switch the device we're monitoring
