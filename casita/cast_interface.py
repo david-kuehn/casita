@@ -112,6 +112,9 @@ def start_listening(app_class_reference, device_name, is_reconnection):
     chromecast.wait()
 
     print("Connected to " + chromecast.name)
+    
+    global is_connected
+    is_connected = True
 
     app_class.update_cast_devices(chromecast_names, chromecast.name)
 
@@ -134,8 +137,6 @@ def start_listening(app_class_reference, device_name, is_reconnection):
 
     chromecast.socket_client.tries = 1
 
-    global is_connected
-    is_connected = True
 
     # Tell the app class that we're done connecting
     app_class.set_connecting_status(device_name=device_name, is_connecting=False, is_reconnection=is_reconnection, did_succeed=True)
@@ -174,5 +175,5 @@ def discover_devices(app_class_reference):
 def reset_app_class_details():
     global current_media_status
     current_media_status = None
-    #app_class.update_track_details(None)
-    #app_class.update_volume_level(0)
+    app_class.update_track_details(None)
+    app_class.update_volume_level(0)
