@@ -1,7 +1,10 @@
 import json
 import cast_interface
+from os import path
 
 app_class = None
+basepath = path.dirname(__file__)
+filepath = path.abspath(path.join(basepath, "user_preferences.json"))
 
 def init_app_class(app_class_ref):
     global app_class
@@ -10,7 +13,7 @@ def init_app_class(app_class_ref):
 def read_prefs():
     global USER_PREFS
 
-    prefs_file = open("user_preferences.json")
+    prefs_file = open(filepath)
     USER_PREFS = json.loads(prefs_file.read())
     prefs_file.close()
 

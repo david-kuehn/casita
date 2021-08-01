@@ -153,6 +153,8 @@ def stop_listening():
     global is_connected
     is_connected = False
 
+    return True
+
 def discover_devices(app_class_reference):
     global chromecasts, browser
     chromecasts, browser = pychromecast.get_chromecasts()
@@ -172,5 +174,5 @@ def discover_devices(app_class_reference):
 def reset_app_class_details():
     global current_media_status
     current_media_status = None
-    app_class.update_track_details(None)
-    app_class.update_volume_level(0)
+    #app_class.update_track_details(None)
+    #app_class.update_volume_level(0)

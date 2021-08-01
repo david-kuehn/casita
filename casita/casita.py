@@ -1,11 +1,9 @@
-import pychromecast
 import rumps
 import threading
-import time
 import cast_interface
 import prefs
 import sys
-import json
+import time
 
 # Class that handles menubar app itself
 class CasitaApp:
@@ -72,10 +70,8 @@ class CasitaApp:
         # If there is a default device assigned in the user settings, show the 'connecting' menu. Otherwise, show the 'not connected' menu
         if USER_PREFS["default_device"] != "":
             self.update_menu(self.connecting_menu_items, add_quit=False)
-            #self.app.menu = self.connecting_menu_items
         else:
             self.update_menu(self.not_connected_menu_items, add_quit=False)
-            #self.app.menu = self.not_connected_menu_items
 
         # After initializing the menu UI, start the backend's thread
         self.start_thread(USER_PREFS["default_device"])
@@ -153,11 +149,13 @@ class CasitaApp:
 
     # Update list of cast devices
     def update_cast_devices(self, new_cast_devices, new_selected_device):
+        print("1")
         # Determine if the Cast Devices button is already in the menu
         cast_devices_is_in_menu = False
         for item in self.app.menu:
             if item == "Cast Devices":
                 cast_devices_is_in_menu = True
+                print("2")
         
         # If the Cast Devices button isn't already in the menu, add it
         if cast_devices_is_in_menu == False:
@@ -185,7 +183,7 @@ class CasitaApp:
                 else:
                     self.cast_devices_parent.add(device_to_add)
             self.cast_devices_parent.add(None)
-            self.cast_devices_parent.add(rumps.MenuItem(title="Disconnect"))
+            self.cast_devices_parent.add(rumps.MenuItem(title="Disconnect", callback=self.disconnect))
         else:
             self.cast_devices_parent.add(rumps.MenuItem(title="No Devices Found"))
             self.cast_devices_parent.add(None)
@@ -217,8 +215,12 @@ class CasitaApp:
 
     # Restart discovery process
     def scan_again(self, sender):
-        cast_interface.discover_devices(app_class_reference=self)
         print("Restarting scan...")
+        cast_interface.discover_devices(app_class_reference=self)
+
+    def disconnect(self, sender):
+        disconnected = cast_interface.stop_listening()
+        cast_interface.discover_devices(app_class_reference=self)
 
     # Switch the device we're monitoring
     def change_selected_cast_device(self, new_device):
@@ -262,7 +264,6 @@ class CastInterfaceThread(threading.Thread):
             print("No default device. Attempting to start discovery.")
             cast_interface.discover_devices(app_class_reference=self.parent)
         
-
 # Execution loop
 if __name__ == "__main__":
 # If there are arguments passed
