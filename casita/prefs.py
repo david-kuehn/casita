@@ -1,16 +1,19 @@
 import json
 import cast_interface
 from os import path
+from AppKit import NSBundle
 
 app_class = None
-basepath = path.dirname(__file__)
 
-# If the name of the parent directory is 'casita', we're running in a dev environment
-# Otherwise, we're running as a compiled Mac App and need to update preference location accordingly
-if path.basename(basepath) == "casita":
+# The location of the user_preferences.json file becomes fuzzy based on the app
+# context. See: https://github.com/pyinstaller/pyinstaller/issues/5109#issuecomment-683313824
+# First, use AppKit to check the (potential) Application Bundle for the JSON file.
+# If it's not there, use the os.path approach.
+# In this way, preferences will be loaded whether running from source or from binary.
+filepath = NSBundle.mainBundle().pathForResource_ofType_("user_preferences", "json")
+if filepath == None:
+    basepath = path.dirname(__file__)
     filepath = path.abspath(path.join(basepath, "user_preferences.json"))
-else:
-    filepath = path.abspath(path.join(basepath, "../../user_preferences.json"))
 
 def init_app_class(app_class_ref):
     global app_class

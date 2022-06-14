@@ -137,7 +137,6 @@ def start_listening(app_class_reference, device_name, is_reconnection):
 
     chromecast.socket_client.tries = 1
 
-
     # Tell the app class that we're done connecting
     app_class.set_connecting_status(device_name=device_name, is_connecting=False, is_reconnection=is_reconnection, did_succeed=True)
 
