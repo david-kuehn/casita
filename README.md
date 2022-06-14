@@ -35,6 +35,7 @@
 First, download and unzip the [latest release](https://github.com/david-kuehn/casita/releases).
 
 Casita is not officially signed by Apple, meaning that there are a few extra steps in order to be able to run it:
+1. You MUST move the application to your _Applications_ folder in order for it to run. This is due to Apple's translocation of unsigned apps.
 1. Control-click on the app, and choose "Open."
 1. In the alert that appears, if you see an option to open, select it, and Casita should open! Otherwise, choose "Cancel" and proceed to the next step.
 1. Control-click on the app again, choose "Open," and a new alert should appear that gives you an option to open the app.
