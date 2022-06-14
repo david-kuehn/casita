@@ -4,7 +4,13 @@ from os import path
 
 app_class = None
 basepath = path.dirname(__file__)
-filepath = path.abspath(path.join(basepath, "user_preferences.json"))
+
+# If the name of the parent directory is 'casita', we're running in a dev environment
+# Otherwise, we're running as a compiled Mac App and need to update preference location accordingly
+if path.basename(basepath) == "casita":
+    filepath = path.abspath(path.join(basepath, "user_preferences.json"))
+else:
+    filepath = path.abspath(path.join(basepath, "../../user_preferences.json"))
 
 def init_app_class(app_class_ref):
     global app_class
