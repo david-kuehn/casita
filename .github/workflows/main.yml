@@ -33,7 +33,7 @@ jobs:
           if [ -f requirements.txt ]; then sudo pip install -r requirements.txt; fi
           
       - name: Build py2app
-        run: python setup.py py2app
+        run: python3 setup.py py2app --arch=universal2
       
       - name: Upload a Build Artifact
         uses: actions/upload-artifact@v2.2.1
