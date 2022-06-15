@@ -45,7 +45,7 @@ After getting the app to open once, you shouldn't have any more problems in the 
 1. Install all the dependencies from [requirements.txt](./requirements.txt).
    - `pip install -r requirements.txt`
 1. In the project's root directory, build the app using [py2app](https://github.com/ronaldoussoren/py2app).
-   - `python3 setup.py py2app`
+   - `python3 setup.py py2app --arch=universal2`
 1. The newly-generated application can be found in the `dist` directory.
    - Run the generated macOS app!
 

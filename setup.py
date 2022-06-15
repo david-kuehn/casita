@@ -1,6 +1,6 @@
 from setuptools import setup
 
-VERSION = '0.1.5'
+VERSION = '0.1.5.1'
 
 APP = ['casita/casita.py']
 DATA_FILES = [
@@ -12,7 +12,7 @@ OPTIONS = {
     'iconfile': 'house-icon.icns',
     'plist': {
         'LSUIElement': True,
-        'CFBundleShortVersionString': '0.1.5',
+        'CFBundleShortVersionString': '0.1.5.1',
     },
     'packages': ['rumps'],
 }
