@@ -39,6 +39,7 @@ Casita is not officially signed by Apple, meaning that there are a few extra ste
 1. Control-click on the app, and choose "Open."
 1. In the alert that appears, if you see an option to open, select it, and Casita should open! Otherwise, choose "Cancel" and proceed to the next step.
 1. Control-click on the app again, choose "Open," and a new alert should appear that gives you an option to open the app.
+1. If this still doesn't work, open System Preferences, navigate to Privacy and Security, and click "Open Anyway" next to the text that says "Casita was blocked to protect your Mac."
 
 After getting the app to open once, you shouldn't have any more problems in the future. Please refer to [Apple's documentation](https://support.apple.com/en-au/guide/mac-help/mh40616/mac) for further reference.
 ### Manually Building the macOS App
