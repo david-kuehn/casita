@@ -1,6 +1,6 @@
 from setuptools import setup
 
-VERSION = '0.1.5.1'
+VERSION = '0.1.5.2'
 
 APP = ['casita/casita.py']
 DATA_FILES = [
@@ -8,13 +8,13 @@ DATA_FILES = [
     ('', ['casita/img'])
 ]
 OPTIONS = {
-    'argv_emulation': True,
+    'argv_emulation': False,
     'iconfile': 'house-icon.icns',
     'plist': {
         'LSUIElement': True,
-        'CFBundleShortVersionString': '0.1.5.1',
+        'CFBundleShortVersionString': '0.1.5.2',
     },
-    'packages': ['rumps'],
+    'packages': ['rumps', 'zeroconf'],
 }
 
 setup(
@@ -22,5 +22,5 @@ setup(
     name='Casita',
     data_files=DATA_FILES,
     options={'py2app': OPTIONS},
-    setup_requires=['py2app'], install_requires=['rumps']
+    setup_requires=['py2app'], install_requires=['rumps', 'zeroconf']
 )

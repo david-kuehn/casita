@@ -28,7 +28,7 @@ class CasitaApp:
         self.prefs_volume_items = [rumps.MenuItem(title="Set to Favorite Volume", callback=prefs.set_to_favorite_volume), None, rumps.MenuItem(title="Save Current Volume as Favorite", callback=prefs.save_favorite_volume)]
 
         self.prefs_about_parent = rumps.MenuItem(title="About")
-        self.prefs_about_items = [rumps.MenuItem(title="Casita 🏡 | v0.1.5.1"), None, rumps.MenuItem(title="by David Kuehn | Chicago")]
+        self.prefs_about_items = [rumps.MenuItem(title="Casita 🏡 | v0.1.5.2"), None, rumps.MenuItem(title="by David Kuehn | Chicago")]
         
         # Initialize prefs
         self.prefs_parent.add(self.prefs_icon_parent)
